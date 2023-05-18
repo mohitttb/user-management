@@ -1,9 +1,9 @@
 package fiftyfive.administration.usermanagement.dto;
 
-public class CustomErrorMessage {
+public class BaseErrorDTO {
     private String message;
 
-    public CustomErrorMessage(String message) {
+    public BaseErrorDTO(String message) {
         this.message = message;
     }
 

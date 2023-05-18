@@ -1,29 +1,39 @@
 package fiftyfive.administration.usermanagement.exception;
 
-import fiftyfive.administration.usermanagement.dto.CustomErrorMessage;
+import fiftyfive.administration.usermanagement.dto.BaseErrorDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-@RestControllerAdvice
+
+@ControllerAdvice
 public class UserControllerAdvice {
 
-    @ExceptionHandler(UserManagementException.class)
-    public ResponseEntity<CustomErrorMessage> handleUserManagementException(UserManagementException ex) {
-        CustomErrorMessage errorMessage = new CustomErrorMessage(ex.getMessage());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
+    @ExceptionHandler(UserNotExistsException.class)
+    public ResponseEntity<BaseErrorDTO> handleUserNotExistsException(UserNotExistsException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new BaseErrorDTO(ex.getMessage()));
+    }
+    @ExceptionHandler(RecordAlreadyExistsException.class)
+    public ResponseEntity<BaseErrorDTO> handleRecordAlreadyExistsException(RecordAlreadyExistsException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(new BaseErrorDTO(ex.getMessage()));
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<CustomErrorMessage> handleGlobalException(Exception ex) {
-        CustomErrorMessage errorMessage = new CustomErrorMessage("An error occurred while processing the request.");
+    public ResponseEntity<BaseErrorDTO> handleGlobalException(Exception ex) {
+        BaseErrorDTO errorMessage = new BaseErrorDTO("An error occurred while processing the request.");
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorMessage);
     }
 
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<BaseErrorDTO> handleMethodArgumentNotValid(MethodArgumentNotValidException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new BaseErrorDTO(ex.getBindingResult().getFieldErrors().get(0).getDefaultMessage()));
+    }
+
     @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<CustomErrorMessage> handleMethodArgumentNotValid(IllegalArgumentException ex) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new CustomErrorMessage(ex.getMessage()));
+    public ResponseEntity<BaseErrorDTO> handleMethodArgumentNotValid(IllegalArgumentException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new BaseErrorDTO(ex.getMessage()));
     }
 }
 

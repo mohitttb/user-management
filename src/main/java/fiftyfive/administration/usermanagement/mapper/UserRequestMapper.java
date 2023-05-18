@@ -1,5 +1,6 @@
 package fiftyfive.administration.usermanagement.mapper;
 
+
 import fiftyfive.administration.usermanagement.dto.CreateUserRequest;
 import fiftyfive.administration.usermanagement.dto.UpdateUserRequestData;
 import fiftyfive.administration.usermanagement.dto.User;
@@ -10,13 +11,15 @@ import java.time.LocalDateTime;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
+
 
 public class UserRequestMapper {
     ModelMapper modelMapper = new ModelMapper();
 
     public UserResponseData createUserMapper(CreateUserRequest createUserRequest, List<User> users) {
         User user = modelMapper.map(createUserRequest, User.class);
+        user.setCreatedAt(LocalDateTime.now());
+        user.setUpdatedAt(user.getCreatedAt());
         users.add(user);
         return modelMapper.map(user, UserResponseData.class);
     }
@@ -39,7 +42,7 @@ public class UserRequestMapper {
     public UserResponseData getUserMapper(String userName, List<User> users) {
         UserResponseData userResponseData = new UserResponseData();
         for (User user : users) {
-            if (userName != null && user.getUsername().equals(userName)) {
+            if (user.getUsername().equals(userName)) {
                 userResponseData = modelMapper.map(user, UserResponseData.class);
             }
         }
@@ -51,7 +54,7 @@ public class UserRequestMapper {
         Iterator<User> iterator = users.iterator();
         while (iterator.hasNext()) {
             User user = iterator.next();
-            if (userName != null && user.getUsername().equals(userName)) {
+            if (user.getUsername().equals(userName)) {
                 user.setDeletedAt(LocalDateTime.now());
                 userResponseData = modelMapper.map(user, UserResponseData.class);
                 iterator.remove();

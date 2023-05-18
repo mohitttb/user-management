@@ -1,39 +1,41 @@
 package fiftyfive.administration.usermanagement.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
-import java.time.LocalDateTime;
+
 
 @Data
 public class CreateUserRequest {
+    @JsonProperty(value = "username",required = true)
+//    @NotEmpty(message = "Username is required")
+    @NotNull(message = "Username is required")
+//    @NotBlank
     private String username;
-    private String password;
-    @JsonProperty("first_name")
-    private String firstName;
-    @JsonProperty("last_name")
-    private String lastName;
-    private String role;
-    @JsonProperty("created_at")
-    private LocalDateTime createdAt=LocalDateTime.now();
-    @JsonProperty("updated_at")
-    private LocalDateTime updatedAt=LocalDateTime.now();
 
-    public void validate() throws IllegalArgumentException {
-        if (username == null) {
-            throw new IllegalArgumentException("username is null");
-        }
-        if (password == null) {
-            throw new IllegalArgumentException("password is null");
-        }
-        if (firstName == null) {
-            throw new IllegalArgumentException("First Name is null");
-        }
-        if (lastName == null) {
-            throw new IllegalArgumentException("Last Name is null");
-        }
-        if (role == null) {
-            throw new IllegalArgumentException("role is null");
-        }
-    }
+    @JsonProperty(value = "password",required = true)
+//    @NotEmpty(message = "Password is required")
+    @NotNull(message = "Password is required")
+//    @NotBlank
+    private String password;
+
+    @JsonProperty(value = "first_name",required = true)
+//    @NotEmpty(message = "First Name is required")
+    @NotNull(message = "First Name is required")
+//    @NotBlank
+    private String firstName;
+
+    @JsonProperty(value = "last_name",required = true)
+//    @NotEmpty(message = "Last Name is required")
+    @NotNull(message = "Last Name is required")
+//    @NotBlank
+    private String lastName;
+
+    @JsonProperty(value = "role",required = true)
+//    @NotEmpty(message = "Role is required")
+    @NotNull(message = "Role is required")
+//    @NotBlank
+    private String role;
 }

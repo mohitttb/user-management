@@ -13,61 +13,58 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class UserRequestMapper {
-     ModelMapper modelMapper = new ModelMapper();
+    ModelMapper modelMapper = new ModelMapper();
 
-     public UserResponseData createUserMapper(CreateUserRequest createUserRequest, List<User> users){
-          User user = modelMapper.map(createUserRequest, User.class);
-          users.add(user);
-          UserResponseData userResponseData = modelMapper.map(user, UserResponseData.class);
-          return userResponseData;
-     }
+    public UserResponseData createUserMapper(CreateUserRequest createUserRequest, List<User> users) {
+        User user = modelMapper.map(createUserRequest, User.class);
+        users.add(user);
+        return modelMapper.map(user, UserResponseData.class);
+    }
 
-     public UserResponseData updateUserMapper(UpdateUserRequestData updateUserRequestData, List<User> users, String username){
-          UserResponseData userResponseData= new UserResponseData();
-          for(User user:users){
-               if(updateUserRequestData.getUsername()!=null && user.getUsername().equals(username)){
-                    Optional.ofNullable(updateUserRequestData.getFirstName()).ifPresent(user::setFirstName);
-                    Optional.ofNullable(updateUserRequestData.getUsername()).ifPresent(user::setUsername);
-                    Optional.ofNullable(updateUserRequestData.getLastName()).ifPresent(user::setLastName);
-                    Optional.ofNullable(updateUserRequestData.getPassword()).ifPresent(user::setPassword);
-                    Optional.ofNullable(updateUserRequestData.getRole()).ifPresent(user::setRole);
-                    user.setUpdatedAt(LocalDateTime.now());
-                    userResponseData = modelMapper.map(user, UserResponseData.class);
-               }
-          }
-          return userResponseData;
-     }
+    public UserResponseData updateUserMapper(UpdateUserRequestData updateUserRequestData, List<User> users, String username) {
+        UserResponseData userResponseData = new UserResponseData();
+        for (User user : users) {
+            if (user.getUsername().equals(username)) {
+                Optional.ofNullable(updateUserRequestData.getFirstName()).ifPresent(user::setFirstName);
+                Optional.ofNullable(updateUserRequestData.getLastName()).ifPresent(user::setLastName);
+                Optional.ofNullable(updateUserRequestData.getPassword()).ifPresent(user::setPassword);
+                Optional.ofNullable(updateUserRequestData.getRole()).ifPresent(user::setRole);
+                user.setUpdatedAt(LocalDateTime.now());
+                userResponseData = modelMapper.map(user, UserResponseData.class);
+            }
+        }
+        return userResponseData;
+    }
 
-     public UserResponseData getUserMapper(String userName, List<User> users){
-          UserResponseData userResponseData= new UserResponseData();
-          for(User user:users){
-               if(userName!=null && user.getUsername().equals(userName)){
-                    userResponseData = modelMapper.map(user, UserResponseData.class);
-               }
-          }
-          return userResponseData;
-     }
-     public UserResponseData getDeleteMapper(String userName, List<User> users){
-          UserResponseData userResponseData= new UserResponseData();
-          Iterator<User> iterator = users.iterator();
-          while (iterator.hasNext()) {
-               User user = iterator.next();
-               if (userName != null && user.getUsername().equals(userName)) {
-                    user.setDeletedAt(LocalDateTime.now());
-                    userResponseData = modelMapper.map(user, UserResponseData.class);
-                    iterator.remove();
-                    break;
-               }
-          }
+    public UserResponseData getUserMapper(String userName, List<User> users) {
+        UserResponseData userResponseData = new UserResponseData();
+        for (User user : users) {
+            if (userName != null && user.getUsername().equals(userName)) {
+                userResponseData = modelMapper.map(user, UserResponseData.class);
+            }
+        }
+        return userResponseData;
+    }
 
-          return userResponseData;
-     }
+    public UserResponseData getDeleteMapper(String userName, List<User> users) {
+        UserResponseData userResponseData = new UserResponseData();
+        Iterator<User> iterator = users.iterator();
+        while (iterator.hasNext()) {
+            User user = iterator.next();
+            if (userName != null && user.getUsername().equals(userName)) {
+                user.setDeletedAt(LocalDateTime.now());
+                userResponseData = modelMapper.map(user, UserResponseData.class);
+                iterator.remove();
+                break;
+            }
+        }
 
-     public List<UserResponseData> getAllUserMapper(List<User> users){
+        return userResponseData;
+    }
 
-          List<UserResponseData> responseDataList = users.stream()
-                  .map(user -> modelMapper.map(user, UserResponseData.class))
-                  .collect(Collectors.toList());
-          return responseDataList;
-     }
+    public List<UserResponseData> getAllUserMapper(List<User> users) {
+        return users.stream()
+                .map(user -> modelMapper.map(user, UserResponseData.class))
+                .toList();
+    }
 }

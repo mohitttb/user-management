@@ -1,9 +1,7 @@
 package fiftyfive.administration.usermanagement.dto;
-
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
-
 import java.time.LocalDateTime;
 
 @Data
@@ -21,4 +19,6 @@ public class UserResponseData {
     private LocalDateTime updatedAt;
     @JsonProperty("deleted_at")
     private LocalDateTime deletedAt;
+    @JsonProperty("error_message")
+    private String errorMessage;
 }

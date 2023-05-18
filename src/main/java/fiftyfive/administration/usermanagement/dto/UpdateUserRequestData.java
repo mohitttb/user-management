@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 
 @Data
 public class UpdateUserRequestData {
-    private String username;
+
     private String password;
     @JsonProperty("first_name")
     private String firstName;

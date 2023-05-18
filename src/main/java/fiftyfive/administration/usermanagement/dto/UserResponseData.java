@@ -19,6 +19,5 @@ public class UserResponseData {
     private LocalDateTime updatedAt;
     @JsonProperty("deleted_at")
     private LocalDateTime deletedAt;
-    @JsonProperty("error_message")
-    private String errorMessage;
+
 }

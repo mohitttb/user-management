@@ -1,6 +1,10 @@
 package fiftyfive.administration.usermanagement.constant;
 
 public class Constant {
-    public final String USER_ALREADY_EXISTS="User already exists: ";
-    public final String USER_NOT_EXISTS="User not exists: ";
+    public static final String USER_ALREADY_EXISTS = "User already exists: %s";
+    public static final String USER_NOT_EXISTS = "User not exists: %s";
+
+    private Constant() {
+
+    }
 }

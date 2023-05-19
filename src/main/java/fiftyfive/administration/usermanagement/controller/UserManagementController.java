@@ -1,7 +1,6 @@
 package fiftyfive.administration.usermanagement.controller;
 
 import fiftyfive.administration.usermanagement.dto.*;
-import fiftyfive.administration.usermanagement.exception.UserNotExistsException;
 import fiftyfive.administration.usermanagement.implemention.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +20,7 @@ public class UserManagementController {
     UserService userService;
 
     @PostMapping()
-    public ResponseEntity<Object> createUser(@RequestBody @Valid CreateUserRequest createUserRequest) {
+    public ResponseEntity<UserResponseData> createUser(@RequestBody @Valid CreateUserRequest createUserRequest) {
         return ResponseEntity.status(HttpStatus.CREATED).body(userService.createUser(createUserRequest, userList));
     }
 
@@ -49,6 +48,4 @@ public class UserManagementController {
         }
         return ResponseEntity.status(HttpStatus.OK).body(user);
     }
-
-
 }

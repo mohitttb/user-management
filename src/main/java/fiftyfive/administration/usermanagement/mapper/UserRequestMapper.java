@@ -6,13 +6,14 @@ import fiftyfive.administration.usermanagement.dto.UpdateUserRequestData;
 import fiftyfive.administration.usermanagement.dto.User;
 import fiftyfive.administration.usermanagement.dto.UserResponseData;
 import org.modelmapper.ModelMapper;
+import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
-
+@Component
 public class UserRequestMapper {
     ModelMapper modelMapper = new ModelMapper();
 
@@ -61,7 +62,6 @@ public class UserRequestMapper {
                 break;
             }
         }
-
         return userResponseData;
     }
 

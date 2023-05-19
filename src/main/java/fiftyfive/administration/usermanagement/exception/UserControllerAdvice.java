@@ -15,6 +15,7 @@ public class UserControllerAdvice {
     public ResponseEntity<BaseErrorDTO> handleUserNotExistsException(UserNotExistsException ex) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new BaseErrorDTO(ex.getMessage()));
     }
+
     @ExceptionHandler(RecordAlreadyExistsException.class)
     public ResponseEntity<BaseErrorDTO> handleRecordAlreadyExistsException(RecordAlreadyExistsException ex) {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(new BaseErrorDTO(ex.getMessage()));

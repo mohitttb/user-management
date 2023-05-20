@@ -1,6 +1,8 @@
 package fiftyfive.administration.usermanagement.controller;
 
-import fiftyfive.administration.usermanagement.dto.*;
+import fiftyfive.administration.usermanagement.dto.CreateUserRequest;
+import fiftyfive.administration.usermanagement.dto.UpdateUserRequestData;
+import fiftyfive.administration.usermanagement.dto.UserResponseData;
 import fiftyfive.administration.usermanagement.implemention.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,27 +23,27 @@ public class UserManagementController {
         return ResponseEntity.status(HttpStatus.CREATED).body(userService.createUser(createUserRequest));
     }
 
-    @PutMapping("/{username}")
-    public ResponseEntity<UserResponseData> updateUser(@RequestBody UpdateUserRequestData userRequestData, @PathVariable String username) {
-        return ResponseEntity.status(HttpStatus.OK).body(userService.updateUser(userRequestData, username));
+    @PutMapping("/{userId}")
+    public ResponseEntity<UserResponseData> updateUser(@RequestBody UpdateUserRequestData userRequestData, @PathVariable Long userId) {
+        return ResponseEntity.status(HttpStatus.OK).body(userService.updateUser(userRequestData, userId));
 
     }
 
-    @GetMapping("/{username}")
-    public ResponseEntity<UserResponseData> getUser(@PathVariable String username) {
-        return ResponseEntity.status(HttpStatus.OK).body(userService.getUser(username));
+    @GetMapping("/{userId}")
+    public ResponseEntity<UserResponseData> getUser(@PathVariable Long userId) {
+        return ResponseEntity.status(HttpStatus.OK).body(userService.getUser(userId));
     }
 
-    @DeleteMapping("/{username}")
-    public ResponseEntity<UserResponseData> deleteUser(@PathVariable String username) {
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(userService.deleteUser(username));
+    @DeleteMapping("/{userId}")
+    public ResponseEntity<UserResponseData> deleteUser(@PathVariable Long userId) {
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(userService.deleteUser(userId));
     }
 
     @GetMapping()
     public ResponseEntity<List<UserResponseData>> getAllUser() {
         List<UserResponseData> user = userService.getAllUsers();
         if (user.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(user);
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         }
         return ResponseEntity.status(HttpStatus.OK).body(user);
     }
@@ -50,7 +52,7 @@ public class UserManagementController {
     public ResponseEntity<List<UserResponseData>> getAllDeletedUser() {
         List<UserResponseData> user = userService.getAllDeletedUsers();
         if (user.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(user);
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         }
         return ResponseEntity.status(HttpStatus.OK).body(user);
     }

@@ -2,6 +2,7 @@ package fiftyfive.administration.usermanagement.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 
@@ -40,5 +41,6 @@ public class DeletedUser {
     private Long userId;
 
     @Column(name = "deleted_at", nullable = false)
+    @CreationTimestamp
     private LocalDateTime deletedAt;
 }

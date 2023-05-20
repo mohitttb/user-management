@@ -14,7 +14,6 @@ import fiftyfive.administration.usermanagement.repository.UserRepository;
 import fiftyfive.administration.usermanagement.utility.UserValidation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.Optional;
 
@@ -42,6 +41,7 @@ public class UserService {
         }
         user = userRequestMapper.mapToUser(createUserRequest);
         userRepository.save(user);
+        createUserRequest.setId(user.getId());
         return userRequestMapper.createUserResponseMapper(createUserRequest);
     }
 
@@ -61,11 +61,11 @@ public class UserService {
 
     public UserResponseData deleteUser(Long userId) throws UserNotExistsException {
         Optional<User> user = userRepository.findById(userId);
-        if (!user.isPresent()) {
+        if (user.isEmpty()) {
             throw new UserNotExistsException(String.format(Constant.USER_NOT_EXISTS, userId));
         }
-        DeletedUser deletedUser=new DeletedUser();
-        UserResponseData userResponseData = userRequestMapper.getDeleteMapper(deletedUser,user);
+        DeletedUser deletedUser = new DeletedUser();
+        UserResponseData userResponseData = userRequestMapper.getDeleteMapper(deletedUser, user);
         deletedUserRepository.save(deletedUser);
         userRepository.deleteById(deletedUser.getUserId());
         return userResponseData;

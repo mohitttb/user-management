@@ -1,10 +1,16 @@
 package fiftyfive.administration.usermanagement.dto;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.persistence.Id;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
 public class CreateUserRequest {
+
+    @JsonIgnore
+    private Long id;
+
     @JsonProperty(value = "username", required = true)
     @NotNull(message = "Username is required")
     private String username;

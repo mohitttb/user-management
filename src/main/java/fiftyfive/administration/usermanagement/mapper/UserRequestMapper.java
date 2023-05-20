@@ -11,7 +11,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Component;
-
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -35,6 +35,7 @@ public class UserRequestMapper {
             Optional.ofNullable(updateUserRequestData.getLastName()).ifPresent(exsistingUser::setLastName);
             Optional.ofNullable(updateUserRequestData.getPassword()).ifPresent(exsistingUser::setPassword);
             Optional.ofNullable(updateUserRequestData.getRole()).ifPresent(exsistingUser::setRole);
+            user.get().setUpdatedAt(LocalDateTime.now());
         });
         return modelMapper.map(user.orElse(null), UserResponseData.class);
     }
@@ -45,10 +46,7 @@ public class UserRequestMapper {
     }
 
     public UserResponseData getDeleteMapper(DeletedUser deletedUser, Optional<User> userOptional) {
-        User existingUser = userOptional.orElse(null);
-        if (existingUser != null) {
-            modelMapper.map(existingUser, deletedUser);
-        }
+        userOptional.ifPresent(existingUser -> modelMapper.map(existingUser, deletedUser));
         return modelMapper.map(deletedUser, UserResponseData.class);
     }
 
@@ -59,5 +57,4 @@ public class UserRequestMapper {
     public <T> User mapToUser(T dto) {
         return modelMapper.map(dto, User.class);
     }
-
 }

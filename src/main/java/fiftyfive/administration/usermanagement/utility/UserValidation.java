@@ -20,5 +20,4 @@ public class UserValidation {
     private String getExceptionMessage(String constant, String userName) {
         return String.format(constant, userName);
     }
-
 }

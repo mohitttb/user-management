@@ -2,6 +2,7 @@ package fiftyfive.administration.usermanagement.entity;
 import jakarta.persistence.*;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
+
 import java.time.LocalDateTime;
 
 @Entity
@@ -34,5 +35,4 @@ public class User {
 
     @Column(name = "password", nullable = false)
     private String password;
-
 }

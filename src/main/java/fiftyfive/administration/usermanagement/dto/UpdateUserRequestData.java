@@ -13,5 +13,5 @@ public class UpdateUserRequestData {
     private String lastName;
     private String role;
     @JsonProperty("updated_at")
-    private LocalDateTime updatedAt = LocalDateTime.now();
+    private LocalDateTime updatedAt;
 }

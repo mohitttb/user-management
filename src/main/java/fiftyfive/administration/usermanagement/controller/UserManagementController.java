@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 
 @RestController
@@ -35,8 +36,9 @@ public class UserManagementController {
     }
 
     @DeleteMapping("/{userId}")
-    public ResponseEntity<UserResponseData> deleteUser(@PathVariable Long userId) {
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(userService.deleteUser(userId));
+    public ResponseEntity<Void> deleteUser(@PathVariable Long userId) {
+        userService.deleteUser(userId);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping()

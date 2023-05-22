@@ -5,11 +5,7 @@ import fiftyfive.administration.usermanagement.dto.UpdateUserRequestData;
 import fiftyfive.administration.usermanagement.dto.UserResponseData;
 import fiftyfive.administration.usermanagement.entity.DeletedUser;
 import fiftyfive.administration.usermanagement.entity.User;
-import fiftyfive.administration.usermanagement.repository.DeletedUserRepository;
-import fiftyfive.administration.usermanagement.repository.UserRepository;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Component;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -19,14 +15,8 @@ import java.util.Optional;
 public class UserRequestMapper {
     ModelMapper modelMapper = new ModelMapper();
 
-    @Autowired
-    UserRepository userRepository;
-
-    @Autowired
-    DeletedUserRepository deletedUserRepository;
-
-    public UserResponseData createUserResponseMapper(CreateUserRequest createUserRequest) {
-        return modelMapper.map(createUserRequest, UserResponseData.class);
+    public UserResponseData createUserResponseMapper(User user) {
+        return modelMapper.map(user, UserResponseData.class);
     }
 
     public UserResponseData updateUserMapper(UpdateUserRequestData updateUserRequestData, Optional<User> user) {
@@ -40,8 +30,7 @@ public class UserRequestMapper {
         return modelMapper.map(user.orElse(null), UserResponseData.class);
     }
 
-    public UserResponseData getUserMapper(Long userId) {
-        Optional<User> user = userRepository.findById(userId);
+    public UserResponseData getUserMapper(Optional<User> user) {
         return user.map(u -> modelMapper.map(u, UserResponseData.class)).orElse(null);
     }
 
@@ -50,8 +39,8 @@ public class UserRequestMapper {
         return modelMapper.map(deletedUser, UserResponseData.class);
     }
 
-    public <T, R> List<R> getAllUserMapper(JpaRepository<T, Long> repository, Class<R> dtoClass) {
-        return repository.findAll().stream().map(entity -> modelMapper.map(entity, dtoClass)).toList();
+    public <T, R> List<R> getAllUserMapper(List<T> entities, Class<R> dtoClass) {
+        return entities.stream().map(entity -> modelMapper.map(entity, dtoClass)).toList();
     }
 
     public <T> User mapToUser(T dto) {

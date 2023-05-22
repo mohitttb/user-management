@@ -2,6 +2,7 @@ package fiftyfive.administration.usermanagement.entity;
 import jakarta.persistence.*;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 
@@ -30,7 +31,7 @@ public class User {
     private LocalDateTime createdAt;
 
     @Column(name = "updated_at", nullable = false)
-    @CreationTimestamp
+    @UpdateTimestamp
     private LocalDateTime updatedAt;
 
     @Column(name = "password", nullable = false)

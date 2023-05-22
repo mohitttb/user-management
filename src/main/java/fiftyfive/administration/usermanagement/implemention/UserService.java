@@ -42,7 +42,7 @@ public class UserService {
         user = userRequestMapper.mapToUser(createUserRequest);
         userRepository.save(user);
         createUserRequest.setId(user.getId());
-        return userRequestMapper.createUserResponseMapper(createUserRequest);
+        return userRequestMapper.createUserResponseMapper(user);
     }
 
 
@@ -56,10 +56,10 @@ public class UserService {
 
     public UserResponseData getUser(Long userId) throws UserNotExistsException {
         userValidation.isUserExists(Constant.USER_NOT_EXISTS, userId);
-        return userRequestMapper.getUserMapper(userId);
+        return userRequestMapper.getUserMapper(userRepository.findById(userId));
     }
 
-    public UserResponseData deleteUser(Long userId) throws UserNotExistsException {
+    public void deleteUser(Long userId) throws UserNotExistsException {
         Optional<User> user = userRepository.findById(userId);
         if (user.isEmpty()) {
             throw new UserNotExistsException(String.format(Constant.USER_NOT_EXISTS, userId));
@@ -68,15 +68,16 @@ public class UserService {
         UserResponseData userResponseData = userRequestMapper.getDeleteMapper(deletedUser, user);
         deletedUserRepository.save(deletedUser);
         userRepository.deleteById(deletedUser.getUserId());
-        return userResponseData;
     }
 
     public List<UserResponseData> getAllUsers() {
-        return userRequestMapper.getAllUserMapper(userRepository, UserResponseData.class);
+        List<User> users= userRepository.findAll();
+        return userRequestMapper.getAllUserMapper(users, UserResponseData.class);
     }
 
     public List<UserResponseData> getAllDeletedUsers() {
-        return userRequestMapper.getAllUserMapper(deletedUserRepository, UserResponseData.class);
+        List<DeletedUser> deletedUsers= deletedUserRepository.findAll();
+        return userRequestMapper.getAllUserMapper(deletedUsers, UserResponseData.class);
     }
 
 }

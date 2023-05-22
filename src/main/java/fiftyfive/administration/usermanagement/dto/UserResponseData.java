@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserResponseData {
+    private Long id;
     private String username;
     @JsonProperty("first_name")
     private String firstName;

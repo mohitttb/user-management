@@ -1,6 +1,8 @@
 package fiftyfive.administration.usermanagement.controller;
 
-import fiftyfive.administration.usermanagement.dto.*;
+import fiftyfive.administration.usermanagement.dto.CreateUserRequest;
+import fiftyfive.administration.usermanagement.dto.UpdateUserRequestData;
+import fiftyfive.administration.usermanagement.dto.UserResponseData;
 import fiftyfive.administration.usermanagement.implemention.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,43 +10,51 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
 @RequestMapping("/v1/users")
 public class UserManagementController {
-    List<User> userList = new ArrayList<>();
 
     @Autowired
     UserService userService;
 
     @PostMapping()
     public ResponseEntity<UserResponseData> createUser(@RequestBody @Valid CreateUserRequest createUserRequest) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(userService.createUser(createUserRequest, userList));
+        return ResponseEntity.status(HttpStatus.CREATED).body(userService.createUser(createUserRequest));
     }
 
-    @PutMapping("/{username}")
-    public ResponseEntity<UserResponseData> updateUser(@RequestBody UpdateUserRequestData userRequestData, @PathVariable String username) {
-        return ResponseEntity.status(HttpStatus.OK).body(userService.updateUser(userRequestData, userList, username));
+    @PutMapping("/{userId}")
+    public ResponseEntity<UserResponseData> updateUser(@RequestBody UpdateUserRequestData userRequestData, @PathVariable Long userId) {
+        return ResponseEntity.status(HttpStatus.OK).body(userService.updateUser(userRequestData, userId));
 
     }
 
-    @GetMapping("/{username}")
-    public ResponseEntity<UserResponseData> getUser(@PathVariable String username) {
-        return ResponseEntity.status(HttpStatus.OK).body(userService.getUser(username, userList));
+    @GetMapping("/{userId}")
+    public ResponseEntity<UserResponseData> getUser(@PathVariable Long userId) {
+        return ResponseEntity.status(HttpStatus.OK).body(userService.getUser(userId));
     }
 
-    @DeleteMapping("/{username}")
-    public ResponseEntity<UserResponseData> deleteUser(@PathVariable String username) {
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(userService.deleteUser(username, userList));
+    @DeleteMapping("/{userId}")
+    public ResponseEntity<Void> deleteUser(@PathVariable Long userId) {
+        userService.deleteUser(userId);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping()
     public ResponseEntity<List<UserResponseData>> getAllUser() {
-        List<UserResponseData> user = userService.getAllUsers(userList);
+        List<UserResponseData> user = userService.getAllUsers();
         if (user.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(user);
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(user);
+    }
+
+    @GetMapping("/deleted")
+    public ResponseEntity<List<UserResponseData>> getAllDeletedUser() {
+        List<UserResponseData> user = userService.getAllDeletedUsers();
+        if (user.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         }
         return ResponseEntity.status(HttpStatus.OK).body(user);
     }

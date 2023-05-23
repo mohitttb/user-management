@@ -19,7 +19,7 @@ public class UserManagementController {
     @Autowired
     UserService userService;
 
-    @PostMapping()
+    @PostMapping
     public ResponseEntity<UserResponseData> createUser(@RequestBody @Valid CreateUserRequest createUserRequest) {
         return ResponseEntity.status(HttpStatus.CREATED).body(userService.createUser(createUserRequest));
     }
@@ -27,7 +27,6 @@ public class UserManagementController {
     @PutMapping("/{userId}")
     public ResponseEntity<UserResponseData> updateUser(@RequestBody UpdateUserRequestData userRequestData, @PathVariable Long userId) {
         return ResponseEntity.status(HttpStatus.OK).body(userService.updateUser(userRequestData, userId));
-
     }
 
     @GetMapping("/{userId}")

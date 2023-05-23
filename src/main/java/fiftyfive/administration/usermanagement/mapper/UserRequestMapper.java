@@ -1,6 +1,5 @@
 package fiftyfive.administration.usermanagement.mapper;
 
-import fiftyfive.administration.usermanagement.dto.CreateUserRequest;
 import fiftyfive.administration.usermanagement.dto.UpdateUserRequestData;
 import fiftyfive.administration.usermanagement.dto.UserResponseData;
 import fiftyfive.administration.usermanagement.entity.DeletedUser;
@@ -20,14 +19,16 @@ public class UserRequestMapper {
     }
 
     public UserResponseData updateUserMapper(UpdateUserRequestData updateUserRequestData, Optional<User> user) {
-        user.ifPresent(exsistingUser -> {
-            Optional.ofNullable(updateUserRequestData.getFirstName()).ifPresent(exsistingUser::setFirstName);
-            Optional.ofNullable(updateUserRequestData.getLastName()).ifPresent(exsistingUser::setLastName);
-            Optional.ofNullable(updateUserRequestData.getPassword()).ifPresent(exsistingUser::setPassword);
-            Optional.ofNullable(updateUserRequestData.getRole()).ifPresent(exsistingUser::setRole);
-            user.get().setUpdatedAt(LocalDateTime.now());
-        });
-        return modelMapper.map(user.orElse(null), UserResponseData.class);
+        if (user.isEmpty()) {
+            return null; // Return null when user is not present
+        }
+        User existingUser = user.get();
+        Optional.ofNullable(updateUserRequestData.getFirstName()).ifPresent(existingUser::setFirstName);
+        Optional.ofNullable(updateUserRequestData.getLastName()).ifPresent(existingUser::setLastName);
+        Optional.ofNullable(updateUserRequestData.getPassword()).ifPresent(existingUser::setPassword);
+        Optional.ofNullable(updateUserRequestData.getRole()).ifPresent(existingUser::setRole);
+        existingUser.setUpdatedAt(LocalDateTime.now());
+        return modelMapper.map(existingUser, UserResponseData.class);
     }
 
     public UserResponseData getUserMapper(Optional<User> user) {

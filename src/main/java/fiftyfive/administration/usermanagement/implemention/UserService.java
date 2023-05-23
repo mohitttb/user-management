@@ -21,15 +21,19 @@ import java.util.Optional;
 public class UserService {
 
     @Autowired
+    public
     UserRequestMapper userRequestMapper;
 
     @Autowired
+    public
     UserValidation userValidation;
 
     @Autowired
+    public
     UserRepository userRepository;
 
     @Autowired
+    public
     DeletedUserRepository deletedUserRepository;
 
 
@@ -41,7 +45,6 @@ public class UserService {
         }
         user = userRequestMapper.mapToUser(createUserRequest);
         userRepository.save(user);
-        createUserRequest.setId(user.getId());
         return userRequestMapper.createUserResponseMapper(user);
     }
 
@@ -65,7 +68,7 @@ public class UserService {
             throw new UserNotExistsException(String.format(Constant.USER_NOT_EXISTS, userId));
         }
         DeletedUser deletedUser = new DeletedUser();
-        UserResponseData userResponseData = userRequestMapper.getDeleteMapper(deletedUser, user);
+        userRequestMapper.getDeleteMapper(deletedUser, user);
         deletedUserRepository.save(deletedUser);
         userRepository.deleteById(deletedUser.getUserId());
     }

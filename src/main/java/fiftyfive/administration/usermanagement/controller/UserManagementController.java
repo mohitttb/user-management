@@ -40,7 +40,7 @@ public class UserManagementController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping()
+    @GetMapping
     public ResponseEntity<List<UserResponseData>> getAllUser() {
         List<UserResponseData> user = userService.getAllUsers();
         if (user.isEmpty()) {

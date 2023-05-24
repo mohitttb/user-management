@@ -44,19 +44,12 @@ class UserValidationTest {
 
     @Test
     void testIsUserExists_UserNotExists() {
-        // Given
         Long userId = 2L;
         List<User> users = new ArrayList<>();
-
         when(userRepository.findAll()).thenReturn(users);
-
-        // When
         UserNotExistsException exception = assertThrows(UserNotExistsException.class, () ->
                 userValidation.isUserExists(Constant.USER_NOT_EXISTS, userId));
-
-        // Then
         assertEquals(String.format(Constant.USER_NOT_EXISTS, userId), exception.getMessage());
-
         verify(userRepository, times(1)).findAll();
     }
 }

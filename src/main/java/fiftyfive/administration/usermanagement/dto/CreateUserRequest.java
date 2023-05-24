@@ -7,8 +7,7 @@ import lombok.Data;
 @Data
 public class CreateUserRequest {
 
-    @JsonIgnore
-    private Long id;
+
 
     @JsonProperty(value = "username", required = true)
     @NotNull(message = "Username is required")

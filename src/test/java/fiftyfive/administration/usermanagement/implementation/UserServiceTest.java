@@ -21,31 +21,29 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
-import org.springframework.util.Assert;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 
 import java.time.LocalDateTime;
-import java.util.*;
-
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
- class UserServiceTest {
+class UserServiceTest {
 
-    private UserService userService;
-    private UserResponseData userResponseData= new UserResponseData();
-    private CreateUserRequest createUserRequest= new CreateUserRequest();
-
-    private DeletedUser deletedUser;
-    private UpdateUserRequestData updateUserRequestData;
     ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
     Validator validator = factory.getValidator();
+    private UserService userService;
+    private UserResponseData userResponseData = new UserResponseData();
+    private CreateUserRequest createUserRequest = new CreateUserRequest();
+    private DeletedUser deletedUser;
+    private UpdateUserRequestData updateUserRequestData;
     private User existingUser = new User();
     @Mock
     private UserRequestMapper userRequestMapper;
@@ -55,11 +53,12 @@ import static org.mockito.Mockito.*;
     private UserRepository userRepository;
     @Mock
     private DeletedUserRepository deletedUserRepository;
+
     @BeforeEach
     void setUp() {
         ModelMapper modelMapper = new ModelMapper();
 
-        userService= new UserService();
+        userService = new UserService();
         existingUser.setId(1L);
         existingUser.setFirstName("Jane");
         existingUser.setUsername("janedane");
@@ -69,7 +68,7 @@ import static org.mockito.Mockito.*;
         existingUser.setCreatedAt(LocalDateTime.now());
         existingUser.setUpdatedAt(existingUser.getCreatedAt());
 
-        deletedUser= modelMapper.map(existingUser,DeletedUser.class);
+        deletedUser = modelMapper.map(existingUser, DeletedUser.class);
 
         userResponseData.setId(1L);
         userResponseData.setFirstName("Jane");
@@ -79,7 +78,7 @@ import static org.mockito.Mockito.*;
         userResponseData.setCreatedAt(LocalDateTime.now());
         userResponseData.setUpdatedAt(existingUser.getCreatedAt());
 
-        createUserRequest=modelMapper.map(existingUser,CreateUserRequest.class);
+        createUserRequest = modelMapper.map(existingUser, CreateUserRequest.class);
 
         userRequestMapper = mock(UserRequestMapper.class);
         userValidation = mock(UserValidation.class);
@@ -121,7 +120,7 @@ import static org.mockito.Mockito.*;
     }
 
     @Test()
-    void testCreateUser_CreateUserValidation(){
+    void testCreateUser_CreateUserValidation() {
         createUserRequest.setPassword(null);
         Set<ConstraintViolation<CreateUserRequest>> violations = validator.validate(createUserRequest);
         assertFalse(violations.isEmpty());
@@ -146,13 +145,14 @@ import static org.mockito.Mockito.*;
         when(userValidation.isUserExists(Constant.USER_NOT_EXISTS, 1L)).thenThrow(new UserNotExistsException("User does not exist"));
         Assertions.assertThrows(UserNotExistsException.class, () -> userService.updateUser(updateUserRequestData, 1L));
     }
+
     public UserResponseData getUser(Long userId) throws UserNotExistsException {
         userValidation.isUserExists(Constant.USER_NOT_EXISTS, userId);
         return userRequestMapper.getUserMapper(userRepository.findById(userId));
     }
 
     @Test
-    void getUser_Successfully(){
+    void testGetUser_Successfully() {
         when(userValidation.isUserExists(anyString(), anyLong())).thenReturn(existingUser);
         when(userValidation.isUserExists(anyString(), anyLong())).thenReturn(new User());
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(existingUser));
@@ -162,42 +162,26 @@ import static org.mockito.Mockito.*;
     }
 
     @Test
-    void getUser_UserNotExistsException(){
-        when(userValidation.isUserExists(Constant.USER_NOT_EXISTS, 1L)).thenThrow(new UserNotExistsException(String.format(Constant.USER_NOT_EXISTS,1)));
+    void testGetUser_UserNotExistsException() {
+        when(userValidation.isUserExists(Constant.USER_NOT_EXISTS, 1L)).thenThrow(new UserNotExistsException(String.format(Constant.USER_NOT_EXISTS, 1)));
         Assertions.assertThrows(UserNotExistsException.class, () -> userService.getUser(1L));
     }
 
     @Test
     void testDeleteUser_Successful() throws UserNotExistsException {
-        // Mocking dependencies
-
-        // Creating test data
-
-
-        // Mocking repository behavior
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(existingUser));
         userService.deleteUser(existingUser.getId());
-
-        // Verifying the interactions
         verify(userRepository, times(1)).findById(existingUser.getId());
-     }
+    }
 
 
     @Test
     void testDeleteUser_UserNotExistsException() {
-        // Creating test data
         Long userId = 1L;
-
-        // Mocking repository behavior
         when(userRepository.findById(userId)).thenReturn(Optional.empty());
-
-
-        // Asserting that UserNotExistsException is thrown
         assertThrows(UserNotExistsException.class, () -> {
             userService.deleteUser(userId);
         });
-
-        // Verifying the interactions
         verify(userRepository, times(1)).findById(userId);
         verify(deletedUserRepository, never()).save(any(DeletedUser.class));
         verify(userRepository, never()).deleteById(userId);
@@ -205,34 +189,23 @@ import static org.mockito.Mockito.*;
 
     @Test
     void testGetAllUsers_Success() {
-        // Given
         List<User> users = new ArrayList<>();
         users.add(existingUser);
-        List<UserResponseData>userResponseDataList= new ArrayList<>();
+        List<UserResponseData> userResponseDataList = new ArrayList<>();
         userResponseDataList.add(userResponseData);
         when(userRepository.findAll()).thenReturn(users);
         when(userRequestMapper.getAllUserMapper(anyList(), any(Class.class))).thenReturn(userResponseDataList);
-
-        // When
         List<UserResponseData> response = userService.getAllUsers();
-
-        // Then
         Assertions.assertNotNull(response);
-        // Add more assertions as per your requirements
     }
 
     @Test
     void testGetAllDeletedUsers_Success() {
-        // Given
         List<DeletedUser> deletedUsers = new ArrayList<>();
         deletedUsers.add(new DeletedUser());
         when(deletedUserRepository.findAll()).thenReturn(deletedUsers);
         when(userRequestMapper.getAllUserMapper(anyList(), any(Class.class))).thenReturn(new ArrayList<>());
-
-        // When
         List<UserResponseData> response = userService.getAllDeletedUsers();
-
-        // Then
         Assertions.assertNotNull(response);
 
     }

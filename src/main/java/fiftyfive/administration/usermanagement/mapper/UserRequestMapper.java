@@ -20,7 +20,7 @@ public class UserRequestMapper {
 
     public UserResponseData updateUserMapper(UpdateUserRequestData updateUserRequestData, Optional<User> user) {
         if (user.isEmpty()) {
-            return null; // Return null when user is not present
+            return null;
         }
         User existingUser = user.get();
         Optional.ofNullable(updateUserRequestData.getFirstName()).ifPresent(existingUser::setFirstName);

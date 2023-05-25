@@ -73,7 +73,7 @@ public class UserManagementControllerTest {
 
 
     @Test
-    public void testCreateUser_ArgumentNotValid_InvalidRequest_ReturnsBadRequest() throws Exception {
+    public void testCreateUser_Null_Password_ArgumentNotValid_InvalidRequest_ReturnsBadRequest() throws Exception {
         createUserRequest.setPassword(null);
         String requestJson = objectMapper.writeValueAsString(createUserRequest);
         mockMvc.perform(post("/v1/users")
@@ -81,6 +81,50 @@ public class UserManagementControllerTest {
                         .content(requestJson))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("Password is required"));
+    }
+
+    @Test
+    public void testCreateUser_Null_Role_ArgumentNotValid_InvalidRequest_ReturnsBadRequest() throws Exception {
+        createUserRequest.setRole(null);
+        String requestJson = objectMapper.writeValueAsString(createUserRequest);
+        mockMvc.perform(post("/v1/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestJson))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("Role is required"));
+    }
+
+    @Test
+    public void testCreateUser_Null_Username_ArgumentNotValid_InvalidRequest_ReturnsBadRequest() throws Exception {
+        createUserRequest.setUsername(null);
+        String requestJson = objectMapper.writeValueAsString(createUserRequest);
+        mockMvc.perform(post("/v1/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestJson))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("Username is required"));
+    }
+
+    @Test
+    public void testCreateUser_Null_First_Name_ArgumentNotValid_InvalidRequest_ReturnsBadRequest() throws Exception {
+        createUserRequest.setFirstName(null);
+        String requestJson = objectMapper.writeValueAsString(createUserRequest);
+        mockMvc.perform(post("/v1/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestJson))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("First Name is required"));
+    }
+
+    @Test
+    public void testCreateUser_Null_Last_Name_ArgumentNotValid_InvalidRequest_ReturnsBadRequest() throws Exception {
+        createUserRequest.setFirstName(null);
+        String requestJson = objectMapper.writeValueAsString(createUserRequest);
+        mockMvc.perform(post("/v1/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestJson))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("First Name is required"));
     }
 
     @Test

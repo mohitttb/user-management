@@ -1,8 +1,6 @@
 package fiftyfive.administration.usermanagement.controller;
 
-import fiftyfive.administration.usermanagement.dto.CreateUserRequest;
-import fiftyfive.administration.usermanagement.dto.UpdateUserRequestData;
-import fiftyfive.administration.usermanagement.dto.UserResponseData;
+import fiftyfive.administration.usermanagement.dto.*;
 import fiftyfive.administration.usermanagement.implemention.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,4 +55,10 @@ public class UserManagementController {
         }
         return ResponseEntity.status(HttpStatus.OK).body(user);
     }
+
+    @PostMapping("/login")
+    public ResponseEntity<LoginResponse> loginUser(@RequestBody @Valid LoginRequest loginRequest) {
+        return ResponseEntity.status(HttpStatus.OK).body(userService.login(loginRequest));
+    }
+
 }

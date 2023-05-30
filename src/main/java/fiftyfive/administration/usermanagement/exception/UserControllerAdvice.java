@@ -36,10 +36,5 @@ public class UserControllerAdvice {
     public ResponseEntity<BaseErrorDTO> handleMethodArgumentNotValid(IllegalArgumentException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new BaseErrorDTO(ex.getMessage()));
     }
-
-    @ExceptionHandler(TokenValidationException.class)
-    public ResponseEntity<BaseErrorDTO> handleTokenValidationException(TokenValidationException ex) {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new BaseErrorDTO(ex.getMessage()));
-    }
 }
 

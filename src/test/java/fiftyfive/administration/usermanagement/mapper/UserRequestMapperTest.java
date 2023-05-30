@@ -8,6 +8,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.modelmapper.ModelMapper;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +23,7 @@ class UserRequestMapperTest {
 
     @BeforeEach
     void setUp() {
+        ModelMapper modelMapper = new ModelMapper();
         userRequestMapper = new UserRequestMapper();
         existingUser.setId(1L);
         existingUser.setFirstName("Jane");
@@ -31,43 +33,32 @@ class UserRequestMapperTest {
         existingUser.setPassword("password");
         existingUser.setCreatedAt(LocalDateTime.now());
         existingUser.setUpdatedAt(existingUser.getCreatedAt());
-
-        userResponseData.setId(1L);
-        userResponseData.setFirstName("Jane");
-        userResponseData.setUsername("janedane");
-        userResponseData.setLastName("Smith");
-        userResponseData.setRole("user");
-        userResponseData.setCreatedAt(LocalDateTime.now());
-        userResponseData.setUpdatedAt(existingUser.getCreatedAt());
+        userResponseData = modelMapper.map(existingUser, UserResponseData.class);
     }
 
     @Test
     void testCreateUserResponseMapper() {
         // Given
-        User user = new User();
-        user.setId(1L);
-        user.setFirstName("John");
-        user.setLastName("Doe");
-        UserResponseData responseData = userRequestMapper.createUserResponseMapper(user);
+        UserResponseData responseData = userRequestMapper.createUserResponseMapper(existingUser);
         assertNotNull(responseData);
         assertEquals(1L, responseData.getId());
-        assertEquals("John", responseData.getFirstName());
-        assertEquals("Doe", responseData.getLastName());
+        assertEquals("Jane", responseData.getFirstName());
+        assertEquals("Smith", responseData.getLastName());
     }
 
     @Test
-    void testUpdateUserMapper_UserExists() {
+    void testUpdateUserMapper_WhenUserExists() {
         UpdateUserRequestData updateUserRequestData = new UpdateUserRequestData();
-        updateUserRequestData.setFirstName("John");
-        updateUserRequestData.setLastName("Doe");
+        updateUserRequestData.setFirstName("Jane");
+        updateUserRequestData.setLastName("Smith");
         updateUserRequestData.setPassword("password");
         updateUserRequestData.setRole("user");
         Optional<User> user = Optional.of(existingUser);
         UserResponseData responseData = userRequestMapper.updateUserMapper(updateUserRequestData, user);
         assertNotNull(responseData);
         assertEquals(1L, responseData.getId());
-        assertEquals("John", responseData.getFirstName());
-        assertEquals("Doe", responseData.getLastName());
+        assertEquals("Jane", responseData.getFirstName());
+        assertEquals("Smith", responseData.getLastName());
         assertEquals("password", existingUser.getPassword());
         assertEquals("user", existingUser.getRole());
         assertNotNull(existingUser.getUpdatedAt());
@@ -75,17 +66,17 @@ class UserRequestMapperTest {
     }
 
     @Test
-    void testUpdateUserMapper_UserNotExists() {
+    void testUpdateUserMapper_WhenUserNotExists() {
         UpdateUserRequestData updateUserRequestData = new UpdateUserRequestData();
-        updateUserRequestData.setFirstName("John");
-        updateUserRequestData.setLastName("Doe");
+        updateUserRequestData.setFirstName("Jane");
+        updateUserRequestData.setLastName("Smith");
         Optional<User> user = Optional.empty();
         UserResponseData responseData = userRequestMapper.updateUserMapper(updateUserRequestData, user);
         assertNull(responseData);
     }
 
     @Test
-    void testGetUserMapper_UserExists() {
+    void testGetUserMapper_WhenUserExists() {
         Optional<User> user = Optional.of(existingUser);
         UserResponseData responseData = userRequestMapper.getUserMapper(user);
         assertNotNull(responseData);
@@ -95,14 +86,14 @@ class UserRequestMapperTest {
     }
 
     @Test
-    void testGetUserMapper_UserNotExists() {
+    void testGetUserMapper_WhenUserNotExists() {
         Optional<User> user = Optional.empty();
         UserResponseData responseData = userRequestMapper.getUserMapper(user);
         assertNull(responseData);
     }
 
     @Test
-    void testGetDeleteMapper_UserExists() {
+    void testGetDeleteMapper_WhenUserExists() {
         UserResponseData responseData = userRequestMapper.getDeleteMapper(new DeletedUser(), Optional.of(existingUser));
         assertNotNull(responseData);
         assertEquals(existingUser.getId(), responseData.getId());
@@ -111,7 +102,7 @@ class UserRequestMapperTest {
     }
 
     @Test
-    void testGetDeleteMapper_UserNotExists() {
+    void testGetDeleteMapper_WhenUserNotExists() {
         UserResponseData responseData = userRequestMapper.getDeleteMapper(new DeletedUser(), Optional.of(new User()));
         assertNull(responseData.getId());
         assertNull(responseData.getUsername());
@@ -124,7 +115,7 @@ class UserRequestMapperTest {
     }
 
     @Test
-    void testGetAllUserMapper_UserExists() {
+    void testGetAllUserMapper_WhenUserExists() {
         List<User> users = new ArrayList<>();
         users.add(existingUser);
         List<UserResponseData> responseDataList = userRequestMapper.getAllUserMapper(users, UserResponseData.class);
@@ -140,7 +131,7 @@ class UserRequestMapperTest {
     }
 
     @Test
-    void testGetAllUserMapper_NullUser() {
+    void testGetAllUserMapper_WhenUserNotExists() {
         List<User> users = new ArrayList<>();
         List<UserResponseData> responseDataList = userRequestMapper.getAllUserMapper(users, UserResponseData.class);
         assertEquals(0, responseDataList.size());

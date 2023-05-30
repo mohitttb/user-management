@@ -29,7 +29,7 @@ class UserValidationTest {
     }
 
     @Test
-    void testIsUserExists_UserExists() throws UserNotExistsException {
+    void testIsUserExists_WhenUserExists() throws UserNotExistsException {
         Long userId = 1L;
         User user = new User();
         user.setId(userId);
@@ -43,7 +43,7 @@ class UserValidationTest {
     }
 
     @Test
-    void testIsUserExists_UserNotExists() {
+    void testIsUserExists_WhenUserNotExists() {
         Long userId = 2L;
         List<User> users = new ArrayList<>();
         when(userRepository.findAll()).thenReturn(users);

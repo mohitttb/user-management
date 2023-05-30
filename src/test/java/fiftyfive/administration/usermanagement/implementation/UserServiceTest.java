@@ -43,7 +43,6 @@ class UserServiceTest {
     private UserResponseData userResponseData = new UserResponseData();
     private CreateUserRequest createUserRequest = new CreateUserRequest();
     private DeletedUser deletedUser;
-    private UpdateUserRequestData updateUserRequestData;
     private User existingUser = new User();
     @Mock
     private UserRequestMapper userRequestMapper;
@@ -69,15 +68,7 @@ class UserServiceTest {
         existingUser.setUpdatedAt(existingUser.getCreatedAt());
 
         deletedUser = modelMapper.map(existingUser, DeletedUser.class);
-
-        userResponseData.setId(1L);
-        userResponseData.setFirstName("Jane");
-        userResponseData.setUsername("janedane");
-        userResponseData.setLastName("Smith");
-        userResponseData.setRole("user");
-        userResponseData.setCreatedAt(LocalDateTime.now());
-        userResponseData.setUpdatedAt(existingUser.getCreatedAt());
-
+        userResponseData = modelMapper.map(existingUser,UserResponseData.class);
         createUserRequest = modelMapper.map(existingUser, CreateUserRequest.class);
 
         userRequestMapper = mock(UserRequestMapper.class);
@@ -93,7 +84,7 @@ class UserServiceTest {
     }
 
     @Test
-    void testCreateUser_Successfull() {
+    void testCreateUser_Successfully() {
         User user = new User();
         UserResponseData userResponseData = new UserResponseData();
         when(userRepository.findByUsername(createUserRequest.getUsername())).thenReturn(null);
@@ -110,9 +101,7 @@ class UserServiceTest {
     }
 
     @Test()
-    void testCreateUser_RecordAlreadyExistsException() {
-        User user = new User();
-        UserResponseData userResponseData = new UserResponseData();
+    void testCreateUser_WhenRecordAlreadyExistsException() {
         when(userRepository.findByUsername(createUserRequest.getUsername())).thenReturn(existingUser);
         assertThrows(RecordAlreadyExistsException.class, () -> {
             userService.createUser(createUserRequest);
@@ -127,7 +116,7 @@ class UserServiceTest {
     }
 
     @Test
-    void testUpdateUser_Successfull() {
+    void testUpdateUser_Successfully() {
         UpdateUserRequestData updateUserRequestData = new UpdateUserRequestData();
         UserResponseData userResponseData = new UserResponseData();
         when(userValidation.isUserExists(Constant.USER_NOT_EXISTS, 1L)).thenReturn(existingUser);
@@ -140,15 +129,10 @@ class UserServiceTest {
     }
 
     @Test
-    void testUpdateUser_Exception() {
+    void testUpdateUser_WhenUserNotExistsException() {
         UpdateUserRequestData updateUserRequestData = new UpdateUserRequestData();
-        when(userValidation.isUserExists(Constant.USER_NOT_EXISTS, 1L)).thenThrow(new UserNotExistsException("User does not exist"));
+        when(userValidation.isUserExists(Constant.USER_NOT_EXISTS, 1L)).thenThrow(new UserNotExistsException(String.format(Constant.USER_NOT_EXISTS,1L)));
         Assertions.assertThrows(UserNotExistsException.class, () -> userService.updateUser(updateUserRequestData, 1L));
-    }
-
-    public UserResponseData getUser(Long userId) throws UserNotExistsException {
-        userValidation.isUserExists(Constant.USER_NOT_EXISTS, userId);
-        return userRequestMapper.getUserMapper(userRepository.findById(userId));
     }
 
     @Test
@@ -162,13 +146,13 @@ class UserServiceTest {
     }
 
     @Test
-    void testGetUser_UserNotExistsException() {
+    void testGetUser_WhenUserNotExistsException() {
         when(userValidation.isUserExists(Constant.USER_NOT_EXISTS, 1L)).thenThrow(new UserNotExistsException(String.format(Constant.USER_NOT_EXISTS, 1)));
         Assertions.assertThrows(UserNotExistsException.class, () -> userService.getUser(1L));
     }
 
     @Test
-    void testDeleteUser_Successful() throws UserNotExistsException {
+    void testDeleteUser_Successfully() throws UserNotExistsException {
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(existingUser));
         userService.deleteUser(existingUser.getId());
         verify(userRepository, times(1)).findById(existingUser.getId());
@@ -176,7 +160,7 @@ class UserServiceTest {
 
 
     @Test
-    void testDeleteUser_UserNotExistsException() {
+    void testDeleteUser_WhenUserNotExistsException() {
         Long userId = 1L;
         when(userRepository.findById(userId)).thenReturn(Optional.empty());
         assertThrows(UserNotExistsException.class, () -> {
@@ -188,7 +172,7 @@ class UserServiceTest {
     }
 
     @Test
-    void testGetAllUsers_Success() {
+    void testGetAllUsers_Successfully() {
         List<User> users = new ArrayList<>();
         users.add(existingUser);
         List<UserResponseData> userResponseDataList = new ArrayList<>();
@@ -200,7 +184,7 @@ class UserServiceTest {
     }
 
     @Test
-    void testGetAllDeletedUsers_Success() {
+    void testGetAllDeletedUsers_Successfully() {
         List<DeletedUser> deletedUsers = new ArrayList<>();
         deletedUsers.add(new DeletedUser());
         when(deletedUserRepository.findAll()).thenReturn(deletedUsers);

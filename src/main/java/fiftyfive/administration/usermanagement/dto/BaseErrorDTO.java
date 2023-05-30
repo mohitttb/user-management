@@ -10,4 +10,6 @@ public class BaseErrorDTO {
     public String getMessage() {
         return message;
     }
+
+
 }

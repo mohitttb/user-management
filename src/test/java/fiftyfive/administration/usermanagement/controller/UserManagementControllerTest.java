@@ -1,6 +1,7 @@
 package fiftyfive.administration.usermanagement.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import fiftyfive.administration.usermanagement.constant.Constant;
 import fiftyfive.administration.usermanagement.dto.CreateUserRequest;
 import fiftyfive.administration.usermanagement.dto.UpdateUserRequestData;
 import fiftyfive.administration.usermanagement.dto.UserResponseData;
@@ -21,19 +22,22 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
 @ExtendWith(SpringExtension.class)
-public class UserManagementControllerTest {
+class UserManagementControllerTest {
+    final StringBuilder userUri = new StringBuilder("/v1/users");
 
     ObjectMapper objectMapper = new ObjectMapper();
     @InjectMocks
@@ -49,7 +53,7 @@ public class UserManagementControllerTest {
     private UpdateUserRequestData updateUserRequestData = new UpdateUserRequestData();
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         MockitoAnnotations.openMocks(this);
 
         ModelMapper modelMapper = new ModelMapper();
@@ -68,15 +72,13 @@ public class UserManagementControllerTest {
         createUserRequest = modelMapper.map(existingUser, CreateUserRequest.class);
         updateUserRequestData = modelMapper.map(existingUser, UpdateUserRequestData.class);
         userResponseData = modelMapper.map(existingUser, UserResponseData.class);
-
     }
 
-
     @Test
-    public void testCreateUser_Null_Password_ArgumentNotValid_InvalidRequest_ReturnsBadRequest() throws Exception {
+    void testCreateUser_WhenPasswordIsNull_ReturnsBadRequest() throws Exception {
         createUserRequest.setPassword(null);
         String requestJson = objectMapper.writeValueAsString(createUserRequest);
-        mockMvc.perform(post("/v1/users")
+        mockMvc.perform(post(userUri.toString())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestJson))
                 .andExpect(status().isBadRequest())
@@ -84,10 +86,10 @@ public class UserManagementControllerTest {
     }
 
     @Test
-    public void testCreateUser_Null_Role_ArgumentNotValid_InvalidRequest_ReturnsBadRequest() throws Exception {
+    void testCreateUser_WhenRoleIsNull_ReturnsBadRequest() throws Exception {
         createUserRequest.setRole(null);
         String requestJson = objectMapper.writeValueAsString(createUserRequest);
-        mockMvc.perform(post("/v1/users")
+        mockMvc.perform(post(userUri.toString())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestJson))
                 .andExpect(status().isBadRequest())
@@ -95,10 +97,10 @@ public class UserManagementControllerTest {
     }
 
     @Test
-    public void testCreateUser_Null_Username_ArgumentNotValid_InvalidRequest_ReturnsBadRequest() throws Exception {
+    void testCreateUser_WhenUsernameIsNull_ReturnsBadRequest() throws Exception {
         createUserRequest.setUsername(null);
         String requestJson = objectMapper.writeValueAsString(createUserRequest);
-        mockMvc.perform(post("/v1/users")
+        mockMvc.perform(post(userUri.toString())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestJson))
                 .andExpect(status().isBadRequest())
@@ -106,10 +108,10 @@ public class UserManagementControllerTest {
     }
 
     @Test
-    public void testCreateUser_Null_First_Name_ArgumentNotValid_InvalidRequest_ReturnsBadRequest() throws Exception {
+    void testCreateUser_WhenFirstNameIsNull_ReturnsBadRequest() throws Exception {
         createUserRequest.setFirstName(null);
         String requestJson = objectMapper.writeValueAsString(createUserRequest);
-        mockMvc.perform(post("/v1/users")
+        mockMvc.perform(post(userUri.toString())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestJson))
                 .andExpect(status().isBadRequest())
@@ -117,129 +119,143 @@ public class UserManagementControllerTest {
     }
 
     @Test
-    public void testCreateUser_Null_Last_Name_ArgumentNotValid_InvalidRequest_ReturnsBadRequest() throws Exception {
-        createUserRequest.setFirstName(null);
+    void testCreateUser_WhenLastNameIsNull_InvalidRequest_ReturnsBadRequest() throws Exception {
+        createUserRequest.setLastName(null);
         String requestJson = objectMapper.writeValueAsString(createUserRequest);
-        mockMvc.perform(post("/v1/users")
+        mockMvc.perform(post(userUri.toString())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestJson))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("First Name is required"));
+                .andExpect(jsonPath("$.message").value("Last Name is required"));
     }
 
     @Test
-    public void testCreateUser_RecordAlreadyExistsException_ReturnConflict() throws Exception {
-      Mockito.doThrow(new RecordAlreadyExistsException("User already exists"))
+    void testCreateUser_WhenRecordAlreadyExistsException_ReturnConflict() throws Exception {
+        Mockito.doThrow(new RecordAlreadyExistsException(String.format(Constant.USER_ALREADY_EXISTS, 1L)))
                 .when(userService)
                 .createUser(Mockito.any(CreateUserRequest.class));
 
         String requestJson = objectMapper.writeValueAsString(createUserRequest);
 
-        mockMvc.perform(post("/v1/users")
+        mockMvc.perform(post(userUri.toString())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestJson))
                 .andExpect(status().isConflict())
-                .andExpect(jsonPath("$.message").value("User already exists"));
+                .andExpect(jsonPath("$.message").value(String.format(Constant.USER_ALREADY_EXISTS, 1L)));
     }
 
     @Test
-    public void testCreateUser_Successfully_ReturnsCreated() throws Exception {
+    void testCreateUser_Successfully_ReturnsCreated() throws Exception {
         String requestJson = objectMapper.writeValueAsString(createUserRequest);
-        mockMvc.perform(post("/v1/users")
+        when(userService.createUser(createUserRequest)).thenReturn(userResponseData);
+        mockMvc.perform(post(userUri.toString())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestJson))
-                .andExpect(status().isCreated());
+                .andExpect(status().isCreated()).andExpect(jsonPath("$.username").value(userResponseData.getUsername()))
+                .andExpect(jsonPath("$.first_name").value(userResponseData.getFirstName()))
+                .andExpect(jsonPath("$.last_name").value(userResponseData.getLastName()))
+                .andExpect(jsonPath("$.role").value(userResponseData.getRole()))
+                .andExpect(jsonPath("$.id").value(userResponseData.getId()))
+                .andExpect(jsonPath("$.created_at").exists())
+                .andExpect(jsonPath("$.updated_at").exists());
+
     }
 
     @Test
-    public void testUpdateUser_UserNotExistsException_ReturnNotFound() throws Exception {
-       Mockito.doThrow(new UserNotExistsException("User not exists"))
+    void testUpdateUser_WhenUserNotExistsException_ReturnNotFound() throws Exception {
+        Mockito.doThrow(new UserNotExistsException(String.format(Constant.USER_NOT_EXISTS, 1L)))
                 .when(userService)
                 .updateUser(Mockito.any(UpdateUserRequestData.class), any());
         String requestJson = objectMapper.writeValueAsString(updateUserRequestData);
-        mockMvc.perform(put("/v1/users/{userId}", 1L)
+        mockMvc.perform(put(userUri.append("/{userId}").toString(), 1L)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestJson))
                 .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.message").value("User not exists"));
+                .andExpect(jsonPath("$.message").value(String.format(Constant.USER_NOT_EXISTS, 1L)));
     }
 
     @Test
-    public void testUpdateUser_Successfully_ReturnsOk() throws Exception {
+    void testUpdateUser_Successfully_ReturnsOk() throws Exception {
+        when(userService.updateUser(updateUserRequestData, 1L)).thenReturn(userResponseData);
         String requestJson = objectMapper.writeValueAsString(updateUserRequestData);
-        mockMvc.perform(put("/v1/users/{userId}", 1L)
+        mockMvc.perform(put(userUri.append("/{userId}").toString(), 1L)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestJson))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk()).andExpect(jsonPath("$.first_name").value(userResponseData.getFirstName()))
+                .andExpect(jsonPath("$.last_name").value(userResponseData.getLastName()))
+                .andExpect(jsonPath("$.role").value(userResponseData.getRole()))
+                .andExpect(jsonPath("$.id").value(userResponseData.getId()))
+                .andExpect(jsonPath("$.created_at").exists())
+                .andExpect(jsonPath("$.updated_at").exists());
     }
 
     @Test
-    public void testDeleteUser_Successfully_ReturnsNoContent() throws Exception {
-        mockMvc.perform(delete("/v1/users/{userId}", 1L)).andExpect(status().isNoContent());
+    void testDeleteUser_Successfully_ReturnsNoContent() throws Exception {
+        mockMvc.perform(delete(userUri.append("/{userId}").toString(), 1L)).andExpect(status().isNoContent());
 
     }
 
     @Test
-    public void testGetAllUser_Successfully_ReturnsOk() throws Exception {
+    void testGetAllUser_Successfully_ReturnsOk() throws Exception {
         List<UserResponseData> userList = new ArrayList<>();
         userList.add(userResponseData);
         when(userService.getAllUsers()).thenReturn(userList);
-        mockMvc.perform(get("/v1/users"))
+        mockMvc.perform(get(userUri.toString()))
                 .andExpect(status().isOk());
     }
 
     @Test
-    public void testGetAllUser_EmptyList_ReturnsNoContent() throws Exception {
+    void testGetAllUser_WhenNoUserExists_ReturnsNoContent() throws Exception {
         List<UserResponseData> userList = Collections.emptyList();
         when(userService.getAllUsers()).thenReturn(userList);
 
-        mockMvc.perform(get("/v1/users"))
+        mockMvc.perform(get(userUri.toString()))
                 .andExpect(status().isNoContent());
     }
 
 
     @Test
-    public void testGetAllDeletedUser_Successfully_ReturnsOk() throws Exception {
+    void testGetAllDeletedUser_Successfully_ReturnsOk() throws Exception {
         List<UserResponseData> userList = new ArrayList<>();
         userList.add(userResponseData);
         when(userService.getAllDeletedUsers()).thenReturn(userList);
-        mockMvc.perform(get("/v1/users/deleted"))
+        mockMvc.perform(get(userUri.append("/deleted").toString()))
                 .andExpect(status().isOk());
     }
 
     @Test
-    public void testGetAllDeletedUser_EmptyList_ReturnsNoContent() throws Exception {
+    void testGetAllDeletedUser_WhenNoUserExists_ReturnsNoContent() throws Exception {
         List<UserResponseData> userList = Collections.emptyList();
         when(userService.getAllDeletedUsers()).thenReturn(userList);
-        mockMvc.perform(get("/v1/users/deleted"))
+        mockMvc.perform(get(userUri.append("/deleted").toString()))
                 .andExpect(status().isNoContent());
     }
 
     @Test
-    public void testDeleteUser_UserNotExistsException_ReturnNotFound() throws Exception {
-        Mockito.doThrow(new UserNotExistsException("User not exists"))
+    void testDeleteUser_WhenUserNotExistsException_ReturnNotFound() throws Exception {
+        Mockito.doThrow(new UserNotExistsException(String.format(Constant.USER_NOT_EXISTS, 1L)))
                 .when(userService)
                 .updateUser(Mockito.any(UpdateUserRequestData.class), any());
         String requestJson = objectMapper.writeValueAsString(updateUserRequestData);
-        mockMvc.perform(put("/v1/users/{userId}", 1L)
+        mockMvc.perform(put(userUri.append("/{userId}").toString(), 1L)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestJson))
                 .andExpect(status().isNotFound());
     }
 
     @Test
-    public void testGetUser_UserNotExistsException_ReturnNotFound() throws Exception {
-        Mockito.doThrow(new UserNotExistsException("User not exists"))
+    void testGetUser_WhenUserNotExistsException_ReturnNotFound() throws Exception {
+        Mockito.doThrow(new UserNotExistsException(String.format(Constant.USER_NOT_EXISTS, 1L)))
                 .when(userService)
                 .getUser(any());
-        mockMvc.perform(get("/v1/users/{userId}", 1L))
+        mockMvc.perform(get(userUri.append("/{userId}").toString(), 1L))
                 .andExpect(status().isNotFound());
     }
 
     @Test
-    public void testGetUser_ExistingUser_ReturnsOkWithUser() throws Exception {
+    void testGetUser_WhenUserExists_ReturnsOkWithUser() throws Exception {
         when(userService.getUser(any())).thenReturn(userResponseData);
-        mockMvc.perform(get("/v1/users/{userId}", 1L))
+        mockMvc.perform(get(userUri.append("/{userId}").toString(), 1L))
                 .andExpect(status().isOk());
     }
 

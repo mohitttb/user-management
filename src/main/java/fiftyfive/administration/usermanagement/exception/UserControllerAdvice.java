@@ -1,6 +1,10 @@
 package fiftyfive.administration.usermanagement.exception;
 
 import fiftyfive.administration.usermanagement.dto.BaseErrorDTO;
+
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -9,6 +13,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 
 
 @ControllerAdvice
+@Slf4j
 public class UserControllerAdvice {
 
     @ExceptionHandler(UserNotExistsException.class)
@@ -23,7 +28,9 @@ public class UserControllerAdvice {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<BaseErrorDTO> handleGlobalException(Exception ex) {
-        BaseErrorDTO errorMessage = new BaseErrorDTO("An error occurred while processing the request.");
+        log.error(String.valueOf(ex.getMessage()));
+        System.out.printf(ex.getMessage());
+        BaseErrorDTO errorMessage = new BaseErrorDTO("An error occurred while processing the request."+ex.getLocalizedMessage());
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorMessage);
     }
 

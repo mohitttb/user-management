@@ -1,23 +1,32 @@
 package fiftyfive.administration.usermanagement.controller;
 
+import com.fasterxml.jackson.databind.util.JSONPObject;
+import com.techprimers.grpc.GreetingResponse;
 import fiftyfive.administration.usermanagement.dto.CreateUserRequest;
 import fiftyfive.administration.usermanagement.dto.UpdateUserRequestData;
 import fiftyfive.administration.usermanagement.dto.UserResponseData;
+import fiftyfive.administration.usermanagement.implemention.GreetingServiceImpl;
 import fiftyfive.administration.usermanagement.implemention.UserService;
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/v1/users")
+@Slf4j
 public class UserManagementController {
 
     @Autowired
-    UserService userService;
+    private UserService userService;
+
+    @Autowired
+    private GreetingServiceImpl greetingService;
 
     @PostMapping
     public ResponseEntity<UserResponseData> createUser(@RequestBody @Valid CreateUserRequest createUserRequest) {
@@ -56,5 +65,10 @@ public class UserManagementController {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         }
         return ResponseEntity.status(HttpStatus.OK).body(user);
+    }
+
+    @PostMapping("/test")
+    public  ResponseEntity<Map<String,String>> testingGprc(@RequestBody Map<String, Object> requestBody){
+        return ResponseEntity.status(HttpStatus.OK).body(greetingService.callGRPCApi((String) requestBody.get("message")));
     }
 }

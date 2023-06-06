@@ -1,0 +1,43 @@
+version: "3.9"
+
+services:
+  microservice:
+    image: microservice-test:v1
+    container_name: micro
+    build:
+      context: .
+    #      dockerfile: Dockerfile
+    ports:
+      - 8080:8080
+    depends_on:
+      - database
+    networks:
+      - microservice-grpc
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-micro:5432/user_management
+      - SPRING_DATASOURCE_USERNAME=hydra
+      - SPRING_DATASOURCE_PASSWORD=secret
+      - grpc.greeting-service=microservice
+      - grpc.greeting-service.port=9090
+
+  database:
+    container_name: postgres-micro
+    image: postgres:9.6
+    environment:
+      - POSTGRES_USER=hydra
+      - POSTGRES_PASSWORD=secret
+      - POSTGRES_DB=user_management
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    networks:
+      - microservice-grpc
+    ports:
+      - 5432:5432
+
+
+networks:
+  microservice-grpc:
+    external: true
+
+volumes:
+  db-data:

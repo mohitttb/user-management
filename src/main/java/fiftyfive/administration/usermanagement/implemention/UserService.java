@@ -94,7 +94,7 @@ public class UserService {
         User user = userRepository.findByUsername(loginRequest.getUsername());
 
         if (user != null && passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
-            loginResponse.setAccessToken(userValidation.generateToken(user.getId()));
+            loginResponse.setAccessToken(userValidation.generateToken(user));
             return loginResponse;
         } else {
             throw new AccessDeniedException("Username or password is invalid");

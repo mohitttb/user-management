@@ -44,14 +44,15 @@ public class UserValidation {
                 .orElseThrow(() -> new UserNotExistsException(getExceptionMessage(constant, userId.toString())));
     }
 
-    public String generateToken(Long userId) {
+    public String generateToken(User user) {
         try {
             JWSSigner signer = new MACSigner(secretKey);
 
             // Prepare JWT with claims
             JWTClaimsSet.Builder builder = new JWTClaimsSet.Builder();
-            builder.subject(userId.toString());
+            builder.subject(user.getId().toString());
             builder.issueTime(new Date());
+            builder.claim("role", user.getRole());
             Instant expirationInstant = Instant.now().plus(expirationTime, ChronoUnit.SECONDS);
 
             builder.expirationTime(Date.from(expirationInstant));
